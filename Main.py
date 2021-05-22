@@ -5,7 +5,8 @@ import subprocess
 from DownloadMethods import Download
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QApplication, QVBoxLayout, QWidget, QPushButton, QGridLayout, QSpacerItem, QSizePolicy, QLabel, QDialog, QFrame, QToolButton, QHBoxLayout, QStyle,  QMainWindow, QFileDialog, QLineEdit )
-from PyQt5.QtCore import Qt, QCoreApplication, QObject, QRunnable, QTimer
+from PyQt5.QtCore import Qt, QCoreApplication, QObject, QRunnable, QTimer, QSize
+from PyQt5.QtGui import QCursor, QWindow
 
 class MainWindow(QDialog):
     def __init__(self, *args, **kwargs):
@@ -44,27 +45,32 @@ class MainWindow(QDialog):
             background: rgba(237, 63, 122, 1);
             min-width: 36px;
             min-height: 36px;
-            font-family: "Webdings";
-            qproperty-text: "r";
             border-radius: 10px;
         }
-            #closeButton:hover {
-                color: #ccc;
-                background: red;
-            }
+        #closeButton:hover {
+            color: #ccc;
+            background: red;
+        }
         """)
+        
         self.setGeometry(200, 200, 592, 316)
         self.setWindowTitle("Bryan Herrera")
         self.font = QtGui.QFont()
         self.std_download_path = str(os.path.join(os.path.expanduser("~"), "Downloads"))
         self.label_1 = QLabel("new border ", self)
-
-        self.setObjectName('Custom_Dialog')
+        self.setMaximumWidth(592)
+        self.setMaximumHeight(200)
+        
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
+        
+        self.setFixedSize(QSize(592, 316))
+        self.setMaximumWidth(self.width())
+        self.setMaximumHeight(self.height())
+
         self.initUI()
 
-        
+    
 
     def initUI(self):
         self.widget = QWidget(self)
@@ -74,9 +80,17 @@ class MainWindow(QDialog):
 
         layout = QGridLayout(self.widget)
         layout.addItem(QSpacerItem(0, 300, QSizePolicy.Expanding, QSizePolicy.Minimum), 40, 0)
-        layout.addWidget(QPushButton('x', self, clicked=self.accept, objectName='closeButton'), 0, 1)                                           
+        layout.addWidget(QPushButton('x', self, clicked=self.accept, objectName='closeButton'), 0, 1)  
+        
+        
+        self.d = QtWidgets.QPushButton(self)
+        self.d.setObjectName("closeButton")
+        self.d.setGeometry(QtCore.QRect(490, 20, 37, 37))
+        self.d.setFont(QtGui.QFont('Tahoma'))
+        self.d.setText("-")
+        self.d.clicked.connect(self.min)
 
-        self.label_1.move(100, 100)
+
         self.label_top = QtWidgets.QLabel(self)
         self.label_top.setObjectName("label_top")
         self.label_top.setGeometry(QtCore.QRect(130, 20, 331, 41))   
@@ -84,7 +98,6 @@ class MainWindow(QDialog):
         self.label_top.setText("Youtube Downloader")
         self.label_top.setFont(QtGui.QFont('Tahoma',20))
 
-        self.label_1.move(100, 100)
         self.label_top = QtWidgets.QLabel(self)
         self.label_top.setObjectName("label_top")
         self.label_top.setGeometry(QtCore.QRect(20, 330, 331, 41))  
@@ -177,6 +190,13 @@ class MainWindow(QDialog):
         self.label_quality.setAlignment(QtCore.Qt.AlignCenter)
         self.label_quality.setText("Download Quality:")
 
+        
+
+    def min(self, event): 
+        
+        self.setWindowState(self.windowState() | QWindow.Minimized)
+        
+        
     def set_button(self):
         file_name = QFileDialog.getExistingDirectory()
         if file_name:
@@ -232,3 +252,4 @@ if __name__ == "__main__":
         else:
             os.system('@powershell -NoProfile -ExecutionPolicy Bypass -Command “iex ((New-Object System.Net.WebClient).DownloadString(‘https://chocolatey.org/install.ps1’))” && SET “PATH=%PATH%;%ALLUSERSPROFILE%/chocolatey/bin”')
     
+  
