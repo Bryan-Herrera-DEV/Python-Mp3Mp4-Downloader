@@ -74,7 +74,7 @@ class MainWindow(QDialog):
 
         layout = QGridLayout(self.widget)
         layout.addItem(QSpacerItem(0, 300, QSizePolicy.Expanding, QSizePolicy.Minimum), 40, 0)
-        layout.addWidget(QPushButton('x', self, clicked=self.accept, objectName='closeButton'), 0, 1)                         
+        layout.addWidget(QPushButton('x', self, clicked=self.accept, objectName='closeButton'), 0, 1)                                           
 
         self.label_1.move(100, 100)
         self.label_top = QtWidgets.QLabel(self)
@@ -223,7 +223,7 @@ if __name__ == "__main__":
             QTimer.singleShot(200, app.quit)
             sys.exit(app.exec_())
         else: 
-            os.system("choco install ffmpeg")
+            os.system("echo y|choco install ffmpeg")
             argu = False
             
     
