@@ -6,6 +6,7 @@ Music and video downloader, Made with love by Bryan Herrera
   <p>If your system does not have it, the program will take care of the installation</p>
   <li>FFmpeg Framework</li>
   <p>If your system does not have it, the program will take care of the installation</p> 
+  <p>Part of the code for the design is made with css, for those who like to modify it and fork my project, they are free to do so.</p>
 </ol>
 
 <h2>FEATURES</H2>
