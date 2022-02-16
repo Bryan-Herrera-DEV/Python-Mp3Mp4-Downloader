@@ -1,7 +1,9 @@
+import platform
 import os
 import sys
 from os import path
 import subprocess
+import validators
 from DownloadMethods import Download
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QApplication, QVBoxLayout, QWidget, QPushButton, QGridLayout, QSpacerItem, QSizePolicy, QLabel, QDialog, QFrame, QToolButton, QHBoxLayout, QStyle,  QMainWindow, QFileDialog, QLineEdit )
@@ -176,12 +178,14 @@ class MainWindow(QDialog):
         self.combo_quality.addItem("")
         self.combo_quality.addItem("")
         self.combo_quality.addItem("")
+        self.combo_quality.addItem("")
         self.combo_quality.setObjectName("combo_quality")
         self.combo_quality.setGeometry(QtCore.QRect(90, 210, 69, 22))
         self.combo_quality.setFont(QtGui.QFont('Tahoma'))
         self.combo_quality.setItemText(0, "Best")
         self.combo_quality.setItemText(1, "Semi")
         self.combo_quality.setItemText(2, "Worst")
+        self.combo_quality.setItemText(3, "iTunes Quality")
 
         self.label_quality = QtWidgets.QLabel(self)
         self.label_quality.setObjectName("label_quality")
@@ -204,18 +208,25 @@ class MainWindow(QDialog):
 
     def download_button(self):
         url = self.input_url.text()
-        save_path = self.input_path.text()
-        quality = self.combo_quality.currentText()
-        if self.radio_single.isChecked():
-            playlist = False
+        if len(url) > 0:
+            if validators.url(url):
+                save_path = self.input_path.text()
+                quality = self.combo_quality.currentText()
+                self.label_done.setText("Descargando, espera por favor....")
+                if self.radio_single.isChecked():
+                    playlist = False
+                else:
+                    playlist = True
+                if self.check_video.isChecked():
+                    Download(url, save_path, quality, playlist).mp4_download()
+                else:
+                    Download(url, save_path, quality, playlist).mp3_download()
+                self.input_url.setText("")
+                self.label_done.setText("Download Done!")
+            else:
+                self.label_done.setText("¡¡¡ URL no válida !!!")
         else:
-            playlist = True
-        if self.check_video.isChecked():
-            Download(url, save_path, quality, playlist).mp4_download()
-        else:
-            Download(url, save_path, quality, playlist).mp3_download()
-        self.input_url.setText("")
-        self.label_done.setText("Download Done!")
+            self.label_done.setText("¡¡¡ URL no especificada !!!")
 
     def command_exists_ffmpeg(self):
         try:
@@ -238,18 +249,35 @@ if __name__ == "__main__":
     argu = True
     app = QApplication(sys.argv)
     while argu == True:
-        if MainWindow().command_exists('choco') == True:
-            print('primero pasado')
-            while argu == True:
-                if MainWindow().command_exists('ffmpeg') == True:
-                    print('segundo pasado')
-                    window = MainWindow()
-                    window.exec_()
-                    QTimer.singleShot(200, app.quit)
-                    sys.exit(app.exec_())
-                else: 
-                    os.system("echo y|choco install ffmpeg")
+        if platform.system == "Windows":
+            if MainWindow().command_exists('choco') == True:
+                print('primero pasado')
+                while argu == True:
+                    if MainWindow().command_exists('ffmpeg') == True:
+                        print('segundo pasado')
+                        window = MainWindow()
+                        window.exec_()
+                        QTimer.singleShot(200, app.quit)
+                        sys.exit(app.exec_())
+                    else: 
+                        os.system("echo y|choco install ffmpeg")
+            else:
+                os.system('@powershell -NoProfile -ExecutionPolicy Bypass -Command “iex ((New-Object System.Net.WebClient).DownloadString(‘https://chocolatey.org/install.ps1’))” && SET “PATH=%PATH%;%ALLUSERSPROFILE%/chocolatey/bin”')
+        elif platform.system() == "Darwin":
+            print("macos")
+            if MainWindow().command_exists('ffmpeg') == True and MainWindow().command_exists('brew') == True:
+                print('segundo pasado')
+                window = MainWindow()
+                window.exec_()
+                QTimer.singleShot(200, app.quit)
+                sys.exit(app.exec_())
+            else: 
+                print("Se requiere de brew y ffmpeg")
+                os.system("echo y|choco install ffmpeg")
+                sys.exit(app.exec_())
         else:
-            os.system('@powershell -NoProfile -ExecutionPolicy Bypass -Command “iex ((New-Object System.Net.WebClient).DownloadString(‘https://chocolatey.org/install.ps1’))” && SET “PATH=%PATH%;%ALLUSERSPROFILE%/chocolatey/bin”')
+            notSupported = "Tu sistema operativo [" + platform.system() +"] todavía no tiene soporte :("
+            print(notSupported)
+            sys.exit(app.exec_())
     
   
